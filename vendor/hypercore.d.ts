@@ -71,12 +71,14 @@ declare namespace Hypercore {
   type ValueEncoding = 'json' | 'utf-8' | 'binary'
 
   interface HypercoreOptions<
-    TValueEncoding extends Hypercore.ValueEncoding = 'binary'
+    TValueEncoding extends Hypercore.ValueEncoding = 'binary',
+    TKey extends Buffer | string | undefined = undefined
   > {
     createIfMissing?: boolean // create a new Hypercore key pair if none was present in storage
     overwrite?: boolean // overwrite any old Hypercore that might already exist
     valueEncoding?: TValueEncoding // defaults to binary
     encodeBatch?(batch: any[]): void // optionally apply an encoding to complete batches
+    key: TKey
     keyPair?: KeyPair // optionally pass the public key and secret key as a key pair
     encryptionKey?: Buffer // optionally pass an encryption key to enable block encryption
     onwait?: () => {} // hook that is called if gets are waiting for download
@@ -100,12 +102,13 @@ declare namespace Hypercore {
 }
 
 declare class Hypercore<
-  TValueEncoding extends Hypercore.ValueEncoding = 'binary'
+  TValueEncoding extends Hypercore.ValueEncoding = 'binary',
+  TKey extends Buffer | string | undefined = undefined
 > extends TypedEmitter<Hypercore.HypercoreEvents> {
   readonly writable: boolean
   readonly readable: boolean
   readonly id: null | string
-  readonly key: null | Buffer
+  readonly key: TKey extends undefined ? null | Buffer : Buffer
   readonly peers: any[]
   readonly keyPair: null | KeyPair
   readonly discoveryKey: null | Buffer
@@ -118,12 +121,12 @@ declare class Hypercore<
   constructor(storage: Hypercore.HypercoreStorage)
   constructor(
     storage: Hypercore.HypercoreStorage,
-    key: Buffer | string,
-    options?: Hypercore.HypercoreOptions<TValueEncoding>
+    key: TKey,
+    options?: Hypercore.HypercoreOptions<TValueEncoding, TKey>
   )
   constructor(
     storage: Hypercore.HypercoreStorage,
-    options?: Hypercore.HypercoreOptions<TValueEncoding>
+    options?: Hypercore.HypercoreOptions<TValueEncoding, TKey>
   )
 
   /** Append a block of data (or an array of blocks) to the core. Returns the
