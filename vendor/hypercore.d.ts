@@ -166,12 +166,8 @@ declare class Hypercore<
     byteLength: number
     prefetch: number
   }): Readable
-  clear(start: number, options?: { diff: boolean }): Promise<boolean>
-  clear(
-    start: number,
-    end: number,
-    options?: { diff: boolean }
-  ): Promise<boolean>
+  clear(start: number, end?: number, opts?: { diff?: boolean }): Promise<{ blocks: number } | null>
+  clear(start: number, opts?: { diff?: boolean }): Promise<{ blocks: number } | null>
   truncate(newLength: number, forkId?: number): Promise<void>
   purge(): Promise<void>
   treeHash(length?: number): Promise<Buffer>
