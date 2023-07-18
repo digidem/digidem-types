@@ -1,7 +1,9 @@
 ## @digidem/types
 
 Typescript type definitions for untyped modules, for internal use prior to
-publishing on DefinitelyTyped
+publishing on DefinitelyTyped.
+
+_Note: Usage of this module requires Typescript >= 5.1_
 
 ## Usage
 
