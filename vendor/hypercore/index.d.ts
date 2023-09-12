@@ -1,18 +1,36 @@
 import { TypedEmitter } from 'tiny-typed-emitter'
 import RandomAccessStorage from 'random-access-storage'
-import RandomAccessMemory from 'random-access-memory'
-import RandomAccessFile from 'random-access-file'
 import { type Duplex, type Readable } from 'streamx'
 
 interface RemoteBitfield {
   get(index: number): boolean
 }
 
-interface HypercoreExtension {
+interface CompactEncodingState {
+  start: number
+  end: number
+  buffer: Buffer | Uint8Array
+  cache: any
+}
+
+interface CompactEncoding<T> {
+  preencode(state: CompactEncodingState, val: T): void
+  encode(state: CompactEncodingState, val: T): void
+  decode(state: CompactEncodingState): T
+}
+
+interface CodecEncoding<T> {
+  encode(val: T): Buffer | Uint8Array
+  decode(buf: Buffer | Uint8Array): T
+}
+
+type Encoding<T> = CompactEncoding<T> | CodecEncoding<T>
+
+interface HypercoreExtension<T> {
   name: string
-  encoding: any
-  send(data: Buffer | Uint8Array, peer: any): void
-  broadcast(data: Buffer | Uint8Array): void
+  encoding: Encoding<T>
+  send(message: T, peer: any): void
+  broadcast(message: T): void
   destroy(): void
 }
 
@@ -169,8 +187,15 @@ declare class Hypercore<
     byteLength: number
     prefetch: number
   }): Readable
-  clear(start: number, end?: number, opts?: { diff?: boolean }): Promise<{ blocks: number } | null>
-  clear(start: number, opts?: { diff?: boolean }): Promise<{ blocks: number } | null>
+  clear(
+    start: number,
+    end?: number,
+    opts?: { diff?: boolean }
+  ): Promise<{ blocks: number } | null>
+  clear(
+    start: number,
+    opts?: { diff?: boolean }
+  ): Promise<{ blocks: number } | null>
   truncate(newLength: number, forkId?: number): Promise<void>
   purge(): Promise<void>
   treeHash(length?: number): Promise<Buffer>
@@ -185,10 +210,13 @@ declare class Hypercore<
   session(options?: Hypercore.HypercoreOptions<TValueEncoding>): Hypercore
   close(): Promise<void>
   ready(): Promise<void>
-  registerExtension(
+  registerExtension<T = Buffer | Uint8Array>(
     name: string,
-    handlers?: { encoding?: any; onmessage?: (buf: Buffer, peer: any) => void }
-  ): HypercoreExtension
+    handlers?: {
+      encoding?: Encoding<T>
+      onmessage?: (message: T, peer: any) => void
+    }
+  ): HypercoreExtension<T>
   replicate(
     isInitiatorOrReplicationStream: boolean | Duplex,
     opts?: { keepAlive?: boolean }
