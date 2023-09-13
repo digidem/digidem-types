@@ -1,6 +1,6 @@
 {
   "name": "@digidem/types",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Typescript type definitions for untyped modules used by Digidem, prior to DefinitelyTyped publishing",
   "main": "index.js",
   "scripts": {
