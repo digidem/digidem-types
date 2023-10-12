@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/digidem/digidem-types/compare/v2.1.0...v2.2.0) (2023-10-12)
+
+
+### Features
+
+* improved hypercore types and new modules ([acb6ab6](https://github.com/digidem/digidem-types/commit/acb6ab6faa5de79b15b735aba1608b31d826f113))
+
 ## [2.1.0](https://github.com/digidem/digidem-types/compare/v2.0.0...v2.1.0) (2023-09-13)
 
 
