@@ -1,6 +1,9 @@
 import { TypedEmitter } from 'tiny-typed-emitter'
 import RandomAccessStorage from 'random-access-storage'
 import { type Duplex, type Readable } from 'streamx'
+import { type Duplex as NodeDuplex } from 'stream'
+import type Protomux from 'protomux'
+import type NoiseStream from '@hyperswarm/secret-stream'
 
 interface RemoteBitfield {
   get(index: number): boolean
@@ -119,6 +122,16 @@ declare namespace Hypercore {
     | ((name: HypercoreStorageName) => RandomAccessStorage)
 }
 
+
+type ProtocolStream = Omit<NoiseStream, 'userData'> & { userData: Protomux }
+type ReplicationStream = Duplex & { noiseStream: ProtocolStream }
+
+type CreateProtocolStreamOpts = {
+  stream?: Duplex | NodeDuplex
+  keepAlive?: boolean
+  ondiscoverykey?: (id: Buffer) => Promise<any>
+}
+
 declare class Hypercore<
   TValueEncoding extends Hypercore.ValueEncoding = 'binary',
   TKey extends Buffer | string | undefined = undefined
@@ -135,6 +148,7 @@ declare class Hypercore<
   readonly contiguousLength: number
   readonly fork: number
   readonly padding: number
+  static createProtocolStream(stream: boolean | Duplex | NodeDuplex | NoiseStream | ProtocolStream | ReplicationStream | Protomux, opts: CreateProtocolStreamOpts): ReplicationStream
 
   constructor(storage: Hypercore.HypercoreStorage)
   constructor(
@@ -218,9 +232,10 @@ declare class Hypercore<
     }
   ): HypercoreExtension<T>
   replicate(
-    isInitiatorOrReplicationStream: boolean | Duplex,
+    isInitiatorOrReplicationStream: boolean | Duplex | NodeDuplex,
     opts?: { keepAlive?: boolean }
-  ): Duplex
+  ): ReplicationStream
+  replicate(protomux: Protomux, opts?: { keepAlive?: boolean }): Protomux
   findingPeers(): () => void
 }
 
