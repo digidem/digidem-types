@@ -1,33 +1,35 @@
 import { Duplex as NodeDuplex } from 'stream'
 import { Duplex, DuplexEvents } from 'streamx'
 
-interface KeyPair {
-  publicKey: Buffer
-  secretKey: Buffer
-}
-
-interface Opts {
-  autostart?: boolean
-  // TODO: Use https://github.com/chm-diederichs/noise-handshake/blob/main/noise.js for specific patterns
-  pattern?: string
-  remotePublicKey?: Buffer
-  keyPair?: KeyPair
-  handshake?: {
-    tx: Buffer
-    rx: Buffer
-    hash: Buffer
+declare namespace NoiseSecretStream {
+  interface KeyPair {
     publicKey: Buffer
-    remotePublicKey: Buffer
+    secretKey: Buffer
+  }
+
+  interface Opts {
+    autostart?: boolean
+    // TODO: Use https://github.com/chm-diederichs/noise-handshake/blob/main/noise.js for specific patterns
+    pattern?: string
+    remotePublicKey?: Buffer
+    keyPair?: KeyPair
+    handshake?: {
+      tx: Buffer
+      rx: Buffer
+      hash: Buffer
+      publicKey: Buffer
+      remotePublicKey: Buffer
+    }
+  }
+
+  type NoiseStreamEvents = {
+    connect: () => void
+    handshake: () => void
   }
 }
 
-type NoiseStreamEvents = {
-  connect: () => void
-  handshake: () => void
-}
-
 declare class NoiseSecretStream<
-  RawStream extends NodeDuplex | Duplex = Duplex
+  RawStream extends NodeDuplex | Duplex = NodeDuplex | Duplex
 > extends Duplex<
   any,
   any,
@@ -35,7 +37,7 @@ declare class NoiseSecretStream<
   any,
   true,
   true,
-  DuplexEvents<any, any> & NoiseStreamEvents
+  DuplexEvents<any, any> & NoiseSecretStream.NoiseStreamEvents
 > {
   readonly isInitiator: boolean
   readonly noiseStream: this
@@ -46,11 +48,15 @@ declare class NoiseSecretStream<
   opened: Promise<boolean>
   userData: any
 
-  constructor(isInitiator: boolean, rawStream?: RawStream, opts?: Opts)
+  constructor(
+    isInitiator: boolean,
+    rawStream?: RawStream,
+    opts?: NoiseSecretStream.Opts
+  )
 
-  static keyPair(seed?: Buffer): KeyPair
+  static keyPair(seed?: Buffer): NoiseSecretStream.KeyPair
 
-  start(rawStream?: NodeDuplex, opts?: Opts): void
+  start(rawStream?: NodeDuplex, opts?: NoiseSecretStream.Opts): void
   setTimeout(ms?: number): void
   setKeepAlive(ms?: number): void
 }

@@ -4,6 +4,7 @@ import { type Duplex, type Readable } from 'streamx'
 import { type Duplex as NodeDuplex } from 'stream'
 import type Protomux from 'protomux'
 import type NoiseStream from '@hyperswarm/secret-stream'
+import RandomAccessFile from '../random-access-file/index.js'
 
 interface RemoteBitfield {
   get(index: number): boolean
@@ -47,11 +48,6 @@ interface HypercorePeer {
   remotePublicKey: Buffer
   remoteBitfield: RemoteBitfield
   onrange(options: PeerOnRangeOptions): void
-}
-
-interface DownloadingRange {
-  destroy(): void
-  done(): Promise<void>
 }
 
 type HypercoreStorageName = 'oplog' | 'tree' | 'bitfield' | 'data'
@@ -120,16 +116,36 @@ declare namespace Hypercore {
   type HypercoreStorage =
     | string
     | ((name: HypercoreStorageName) => RandomAccessStorage)
+
+  interface DownloadingRange {
+    destroy(): void
+    done(): Promise<void>
+  }
+
+  type ReplicationStream<
+    TStream extends Duplex | NodeDuplex = Duplex | NodeDuplex
+  > = TStream & {
+    noiseStream: ProtocolStream
+  }
 }
 
-
-type ProtocolStream = Omit<NoiseStream, 'userData'> & { userData: Protomux }
-type ReplicationStream = Duplex & { noiseStream: ProtocolStream }
+type ProtocolStream = Omit<NoiseStream, 'userData'> & {
+  userData: Protomux<NoiseStream>
+}
 
 type CreateProtocolStreamOpts = {
   stream?: Duplex | NodeDuplex
   keepAlive?: boolean
   ondiscoverykey?: (id: Buffer) => Promise<any>
+}
+
+interface DefaultStorageOptions {
+  unlocked: boolean
+  lock: boolean
+  poolSize: number
+  pool: RandomAccessFile.RAFOptions['pool']
+  rmdir: boolean
+  writable: boolean
 }
 
 declare class Hypercore<
@@ -148,8 +164,30 @@ declare class Hypercore<
   readonly contiguousLength: number
   readonly fork: number
   readonly padding: number
-  static createProtocolStream(stream: boolean | Duplex | NodeDuplex | NoiseStream | ProtocolStream | ReplicationStream | Protomux, opts: CreateProtocolStreamOpts): ReplicationStream
-
+  static createProtocolStream(
+    stream: boolean,
+    opts?: CreateProtocolStreamOpts
+  ): Hypercore.ReplicationStream<Duplex>
+  static createProtocolStream(
+    stream:
+      | Duplex
+      | NodeDuplex
+      | NoiseStream
+      | ProtocolStream
+      | Hypercore.ReplicationStream
+      | Protomux<NoiseStream>,
+    opts?: CreateProtocolStreamOpts
+  ): Hypercore.ReplicationStream
+  static defaultStorage<TStorage extends typeof RandomAccessStorage>(
+    storage: TStorage
+  ): (name: string) => InstanceType<TStorage>
+  static defaultStorage<
+    TStorageFn extends (name: string) => RandomAccessStorage
+  >(storage: TStorageFn): TStorageFn
+  static defaultStorage(
+    storage: string,
+    opts: DefaultStorageOptions
+  ): (name: string) => RandomAccessFile
   constructor(storage: Hypercore.HypercoreStorage)
   constructor(
     storage: Hypercore.HypercoreStorage,
@@ -220,7 +258,7 @@ declare class Hypercore<
     end?: number
     blocks?: number[]
     linear?: boolean
-  }): DownloadingRange
+  }): Hypercore.DownloadingRange
   session(options?: Hypercore.HypercoreOptions<TValueEncoding>): Hypercore
   close(): Promise<void>
   ready(): Promise<void>
@@ -234,8 +272,11 @@ declare class Hypercore<
   replicate(
     isInitiatorOrReplicationStream: boolean | Duplex | NodeDuplex,
     opts?: { keepAlive?: boolean }
-  ): ReplicationStream
-  replicate(protomux: Protomux, opts?: { keepAlive?: boolean }): Protomux
+  ): Hypercore.ReplicationStream
+  replicate(
+    protomux: Protomux<NoiseStream>,
+    opts?: { keepAlive?: boolean }
+  ): Protomux<NoiseStream>
   findingPeers(): () => void
 }
 
