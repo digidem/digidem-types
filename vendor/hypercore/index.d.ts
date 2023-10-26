@@ -166,7 +166,7 @@ declare class Hypercore<
   readonly padding: number
   static createProtocolStream(
     stream: boolean,
-    opts: CreateProtocolStreamOpts
+    opts?: CreateProtocolStreamOpts
   ): Hypercore.ReplicationStream<Duplex>
   static createProtocolStream(
     stream:
@@ -176,7 +176,7 @@ declare class Hypercore<
       | ProtocolStream
       | Hypercore.ReplicationStream
       | Protomux<NoiseStream>,
-    opts: CreateProtocolStreamOpts
+    opts?: CreateProtocolStreamOpts
   ): Hypercore.ReplicationStream
   static defaultStorage<TStorage extends typeof RandomAccessStorage>(
     storage: TStorage
