@@ -4,6 +4,7 @@ import { type Duplex, type Readable } from 'streamx'
 import { type Duplex as NodeDuplex } from 'stream'
 import type Protomux from 'protomux'
 import type NoiseStream from '@hyperswarm/secret-stream'
+import RandomAccessFile, { RAFOptions } from '../random-access-file'
 
 interface RemoteBitfield {
   get(index: number): boolean
@@ -149,6 +150,14 @@ declare class Hypercore<
   readonly fork: number
   readonly padding: number
   static createProtocolStream(stream: boolean | Duplex | NodeDuplex | NoiseStream | ProtocolStream | ReplicationStream | Protomux, opts: CreateProtocolStreamOpts): ReplicationStream
+  static defaultStorage<S extends (name: HypercoreStorageName) => RandomAccessStorage>(storage: S): S;
+  static defaultStorage(
+    storage: string,
+    opts?: Pick<RAFOptions, "lock" | "pool" | "writable"> & {
+      poolSize?: number;
+      rmdir?: boolean;
+      unlocked?: boolean;
+  }): (name: HypercoreStorageName) => RandomAccessFile;
 
   constructor(storage: Hypercore.HypercoreStorage)
   constructor(
