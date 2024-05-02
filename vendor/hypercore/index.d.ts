@@ -132,15 +132,29 @@ type CreateProtocolStreamOpts = {
   ondiscoverykey?: (id: Buffer) => Promise<any>
 }
 
+declare class Bitfield {
+  get(index: number): boolean
+  want(start: number, length: number): IterableIterator<{
+    start: number;
+    bitfield: Uint32Array
+  }>
+}
+
+declare class Core {
+  bitfield: Bitfield
+}
+
 declare class Hypercore<
   TValueEncoding extends Hypercore.ValueEncoding = 'binary',
   TKey extends Buffer | string | undefined = undefined
 > extends TypedEmitter<Hypercore.HypercoreEvents> {
   readonly writable: boolean
   readonly readable: boolean
+  readonly closed: boolean
   readonly id: null | string
   readonly key: TKey extends undefined ? null | Buffer : Buffer
   readonly peers: any[]
+  readonly sessions: unknown[]
   readonly keyPair: null | KeyPair
   readonly discoveryKey: null | Buffer
   readonly encryptionKey: null | Buffer
@@ -148,7 +162,8 @@ declare class Hypercore<
   readonly contiguousLength: number
   readonly fork: number
   readonly padding: number
-  static createProtocolStream(stream: boolean | Duplex | NodeDuplex | NoiseStream | ProtocolStream | ReplicationStream | Protomux, opts: CreateProtocolStreamOpts): ReplicationStream
+  readonly core: null | Core
+  static createProtocolStream(stream: boolean | Duplex | NodeDuplex | NoiseStream | ProtocolStream | ReplicationStream | Protomux, opts?: CreateProtocolStreamOpts): ReplicationStream
 
   constructor(storage: Hypercore.HypercoreStorage)
   constructor(
@@ -220,6 +235,7 @@ declare class Hypercore<
     end?: number
     blocks?: number[]
     linear?: boolean
+    ifAvailable?: boolean
   }): DownloadingRange
   session(options?: Hypercore.HypercoreOptions<TValueEncoding>): Hypercore
   close(): Promise<void>
