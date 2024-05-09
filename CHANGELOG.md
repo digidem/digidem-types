@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/digidem/digidem-types/compare/v2.2.0...v2.3.0) (2024-05-09)
+
+
+### Features
+
+* add new types to Hypercore ([#14](https://github.com/digidem/digidem-types/issues/14)) ([b8ad7e4](https://github.com/digidem/digidem-types/commit/b8ad7e4207e7c9b1969afde4d200e04e11c9f6a9)), closes [/github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/index.js#L76](https://github.com/digidem//github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/index.js/issues/L76) [/github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/index.js#L79](https://github.com/digidem//github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/index.js/issues/L79) [/github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/index.js#L60](https://github.com/digidem//github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/index.js/issues/L60) [/github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/index.js#L338](https://github.com/digidem//github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/index.js/issues/L338) [/github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/index.js#L144](https://github.com/digidem//github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/index.js/issues/L144) [/github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/lib/replicator.js#L1029](https://github.com/digidem//github.com/holepunchto/hypercore/blob/16375ac22e87907b212c03d0e4a8e6b0a38f8c76/lib/replicator.js/issues/L1029)
+* improved hypercore types and new modules ([#9](https://github.com/digidem/digidem-types/issues/9)) ([cb27a44](https://github.com/digidem/digidem-types/commit/cb27a449f21e4fd3d91d4f3749b7e17d3443669a))
+
 ## [2.2.0](https://github.com/digidem/digidem-types/compare/v2.1.0...v2.2.0) (2023-10-12)
 
 
