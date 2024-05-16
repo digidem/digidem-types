@@ -1,4 +1,5 @@
 import { Duplex } from 'streamx'
+import { Duplex as NodeDuplex } from 'stream'
 
 interface PreEncodingState {
   buffer: null
@@ -42,11 +43,15 @@ interface Channel {
   addMessage(opts?: MessageOptions): Message
 }
 
-declare class Protomux {
-  constructor(stream: Duplex)
+declare class Protomux<
+  TStream extends Duplex | NodeDuplex = Duplex | NodeDuplex
+> {
+  constructor(stream: TStream)
   isProtomux: true
-  stream: Duplex
-  static from(stream: Duplex): Protomux
+  stream: TStream
+  static from<TStream extends Duplex | NodeDuplex = Duplex | NodeDuplex>(
+    stream: TStream
+  ): Protomux<TStream>
   static isProtomux(mux: unknown): mux is Protomux
   cork(): void
   uncork(): void
