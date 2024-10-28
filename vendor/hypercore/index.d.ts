@@ -105,6 +105,7 @@ declare namespace Hypercore {
     onwait?: () => {} // hook that is called if gets are waiting for download
     timeout?: number // wait at max some milliseconds (0 means no timeout)
     writable?: boolean // disable appends and truncates
+    preload?: () => PromiseLike<Partial<HypercoreOptions<TValueEncoding, TKey>>>
   }
 
   interface HypercoreGetOptions<
