@@ -91,6 +91,11 @@ declare namespace Hypercore {
 
   type ValueEncoding = 'json' | 'utf-8' | 'binary'
 
+  interface EncryptionOptions {
+    key?: Buffer
+    block?: boolean
+  }
+
   interface HypercoreOptions<
     TValueEncoding extends Hypercore.ValueEncoding = 'binary',
     TKey extends Buffer | string | undefined = undefined
@@ -101,11 +106,14 @@ declare namespace Hypercore {
     encodeBatch?(batch: any[]): void // optionally apply an encoding to complete batches
     key: TKey
     keyPair?: KeyPair // optionally pass the public key and secret key as a key pair
+    /**
+     * @deprecated Replaced with `encryption` field
+     */
     encryptionKey?: Buffer // optionally pass an encryption key to enable block encryption
+    encryption?: EncryptionOptions
     onwait?: () => {} // hook that is called if gets are waiting for download
     timeout?: number // wait at max some milliseconds (0 means no timeout)
     writable?: boolean // disable appends and truncates
-    preload?: () => PromiseLike<Partial<HypercoreOptions<TValueEncoding, TKey>>>
   }
 
   interface HypercoreGetOptions<
