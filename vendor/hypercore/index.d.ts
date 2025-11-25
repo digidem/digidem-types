@@ -204,8 +204,8 @@ declare class Hypercore<
         : unknown)
   >
   /** Check if the core has all blocks between start and end. */
-  has(index: number): boolean
-  has(start: number, end: number): boolean
+  has(index: number): Promise<boolean>
+  has(start: number, end: number): Promise<boolean>
   update(opts?: { wait?: boolean }): Promise<void>
   seek(
     byteOffset: number,
