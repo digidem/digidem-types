@@ -151,6 +151,10 @@ declare class Bitfield {
 
 declare class Core {
   bitfield: Bitfield
+  opened: boolean
+  opening?: Promise<void>
+  closeAllSessions(): Promise<void>
+  close(): Promise<void>
 }
 
 declare class Hypercore<
